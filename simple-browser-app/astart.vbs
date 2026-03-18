@@ -1,10 +1,13 @@
 Set WshShell = CreateObject("WScript.Shell")
+Set FSO = CreateObject("Scripting.FileSystemObject")
 
-' Change directory to the app folder and start the Node.js server
-WshShell.Run "cmd /c cd C:\Users\Asus\.gemini\antigravity\scratch\simple-browser-app && node server.js", 0, False
+appDir = FSO.GetParentFolderName(WScript.ScriptFullName)
 
-' Wait for the server to spin up (2 seconds)
+' Start the Node.js server from this repo's app directory.
+WshShell.Run "cmd /c cd /d """ & appDir & """ && node server.js", 0, False
+
+' Wait for the server to spin up.
 WScript.Sleep 2000
 
-' Open the application in the default browser
-WshShell.Run "http://localhost:3000"
+' Open the application in the default browser.
+WshShell.Run "http://127.0.0.1:3000"

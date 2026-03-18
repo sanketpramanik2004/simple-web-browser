@@ -1,102 +1,167 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web Browser</title>
+    <title>Atlas Browser</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-
 <body>
-    <div class="browser-container">
-        <header class="browser-header">
-            <div class="window-controls">
-                <div class="control close"></div>
-                <div class="control minimize"></div>
-                <div class="control maximize"></div>
-            </div>
-            <div class="nav-buttons">
-                <button class="nav-btn" title="Back" type="button"><i class="fas fa-arrow-left"></i></button>
-                <button class="nav-btn" title="Forward" type="button"><i class="fas fa-arrow-right"></i></button>
-                <button class="nav-btn" title="Refresh" type="button"
-                    onclick="const iframe = document.getElementById('browser-view'); if(iframe.src && !iframe.classList.contains('hidden')) iframe.src = iframe.src;"><i
-                        class="fas fa-rotate-right"></i></button>
-                <button class="nav-btn" title="Home" type="button"
-                    onclick="document.getElementById('welcome-message').classList.remove('hidden'); document.getElementById('browser-view').classList.add('hidden'); document.getElementById('url-input').value = '';"><i
-                        class="fas fa-home"></i></button>
-            </div>
-            <form id="search-form" class="address-bar-container">
-                <div class="security-badge">
-                    <i class="fas fa-lock lock-icon"></i>
-                </div>
-                <input type="text" id="url-input" placeholder="Search or enter web address" required autocomplete="off">
-            </form>
-            <div class="menu-icon">
-                <div class="profile-pic"><i class="fas fa-user"></i></div>
-                <i class="fas fa-ellipsis-v"></i>
-            </div>
-        </header>
+    <div class="page-shell">
+        <div class="ambient ambient-left" aria-hidden="true"></div>
+        <div class="ambient ambient-right" aria-hidden="true"></div>
 
-        <div class="content-area">
-            <div id="loader" class="loader hidden">
-                <div class="spinner"></div>
-                <p>Connecting...</p>
-            </div>
-            <div id="error-message" class="error-message hidden">
-                <i class="fas fa-exclamation-triangle"></i>
-                <span id="error-text">Failed to load content.</span>
-            </div>
-            <div id="welcome-message" class="welcome-message">
-                <div class="logo">
-                    <div class="logo-icon"><i class="fas fa-globe-americas"></i></div>
-                    <h1>Web Browser</h1>
+        <main class="browser-frame">
+            <header class="browser-header">
+                <div class="window-controls" aria-hidden="true">
+                    <span class="control close"></span>
+                    <span class="control minimize"></span>
+                    <span class="control maximize"></span>
                 </div>
 
-                <div class="search-box-large">
-                    <i class="fas fa-search search-icon"></i>
-                    <input type="text" id="home-search" placeholder="Search the web">
+                <div class="toolbar">
+                    <div class="nav-group" aria-label="Navigation controls">
+                        <button class="nav-btn" id="back-btn" title="Back" type="button">
+                            <i class="fas fa-arrow-left"></i>
+                        </button>
+                        <button class="nav-btn" id="forward-btn" title="Forward" type="button">
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                        <button class="nav-btn" id="refresh-btn" title="Refresh" type="button">
+                            <i class="fas fa-rotate-right"></i>
+                        </button>
+                        <button class="nav-btn" id="home-btn" title="Home" type="button">
+                            <i class="fas fa-house"></i>
+                        </button>
+                    </div>
+
+                    <form id="search-form" class="address-bar-container">
+                        <div class="security-badge">
+                            <i class="fas fa-shield-halved"></i>
+                            <span id="security-label">Ready</span>
+                        </div>
+                        <input
+                            type="text"
+                            id="url-input"
+                            placeholder="Search or enter web address"
+                            required
+                            autocomplete="off"
+                        >
+                        <button class="go-btn" type="submit" aria-label="Go">
+                            <i class="fas fa-arrow-up-right-from-square"></i>
+                        </button>
+                    </form>
+
+                    <div class="utility-panel">
+                        <div class="status-pill" id="status-pill">
+                            <span class="status-dot"></span>
+                            <span id="status-text">Home</span>
+                        </div>
+                        <button class="profile-chip" type="button" aria-label="Profile">
+                            <i class="fas fa-user-astronaut"></i>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <section class="content-area">
+                <div id="loader" class="overlay-card loader hidden" aria-live="polite">
+                    <div class="spinner"></div>
+                    <p>Opening destination...</p>
                 </div>
 
-                <div class="shortcuts">
-                    <div class="shortcut"
-                        onclick="document.getElementById('url-input').value = 'https://google.com'; document.getElementById('search-form').dispatchEvent(new Event('submit'));">
-                        <div class="shortcut-icon"><i class="fab fa-google" style="color: #4285F4;"></i></div>
-                        <span>Google</span>
-                    </div>
-                    <div class="shortcut"
-                        onclick="document.getElementById('url-input').value = 'https://github.com'; document.getElementById('search-form').dispatchEvent(new Event('submit'));">
-                        <div class="shortcut-icon"><i class="fab fa-github" style="color: #333;"></i></div>
-                        <span>GitHub</span>
-                    </div>
-                    <div class="shortcut"
-                        onclick="document.getElementById('url-input').value = 'https://youtube.com'; document.getElementById('search-form').dispatchEvent(new Event('submit'));">
-                        <div class="shortcut-icon"><i class="fab fa-youtube" style="color: #FF0000;"></i></div>
-                        <span>YouTube</span>
-                    </div>
-                    <div class="shortcut">
-                        <div class="shortcut-icon add-new"><i class="fas fa-plus"></i></div>
-                        <span>Add shortcut</span>
+                <div id="error-message" class="overlay-card error-message hidden" aria-live="polite">
+                    <i class="fas fa-triangle-exclamation"></i>
+                    <div>
+                        <strong>Connection issue</strong>
+                        <p id="error-text">Failed to load content.</p>
                     </div>
                 </div>
-            </div>
-            <iframe id="browser-view" sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
-                class="hidden"></iframe>
-        </div>
+
+                <section id="welcome-message" class="welcome-message">
+                    <div class="hero-copy">
+                        <p class="eyebrow">Minimal browser experiment</p>
+                        <h1>Browse with a lighter shell and faster focus.</h1>
+                        <p class="hero-text">
+                            Search the web, open a site, and keep the interface calm while the page loads inside the app.
+                        </p>
+                    </div>
+
+                    <div class="search-box-large">
+                        <i class="fas fa-magnifying-glass search-icon"></i>
+                        <input type="text" id="home-search" placeholder="Try github.com or search a topic">
+                        <button id="home-search-btn" class="hero-search-btn" type="button">Explore</button>
+                    </div>
+
+                    <div class="quick-grid">
+                        <button class="quick-card" type="button" data-url="https://google.com">
+                            <span class="quick-icon google"><i class="fab fa-google"></i></span>
+                            <span class="quick-title">Google</span>
+                            <span class="quick-subtitle">Search anything</span>
+                        </button>
+                        <button class="quick-card" type="button" data-url="https://github.com">
+                            <span class="quick-icon github"><i class="fab fa-github"></i></span>
+                            <span class="quick-title">GitHub</span>
+                            <span class="quick-subtitle">Code and repos</span>
+                        </button>
+                        <button class="quick-card" type="button" data-url="https://youtube.com">
+                            <span class="quick-icon youtube"><i class="fab fa-youtube"></i></span>
+                            <span class="quick-title">YouTube</span>
+                            <span class="quick-subtitle">Watch videos</span>
+                        </button>
+                        <button class="quick-card" type="button" data-url="https://developer.mozilla.org">
+                            <span class="quick-icon mdn"><i class="fas fa-code"></i></span>
+                            <span class="quick-title">MDN</span>
+                            <span class="quick-subtitle">Web docs</span>
+                        </button>
+                    </div>
+                </section>
+
+                <iframe
+                    id="browser-view"
+                    sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+                    class="hidden"
+                    title="Browser content"
+                ></iframe>
+            </section>
+        </main>
     </div>
 
     <script>
-        const handleSearch = async (url) => {
-            const urlInput = document.getElementById('url-input');
-            const loader = document.getElementById('loader');
-            const errorMsgContainer = document.getElementById('error-message');
-            const errorText = document.getElementById('error-text');
-            const iframe = document.getElementById('browser-view');
-            const welcomeMsg = document.getElementById('welcome-message');
+        const browserState = {
+            history: [],
+            historyIndex: -1,
+            currentUrl: ''
+        };
+
+        const elements = {
+            form: document.getElementById('search-form'),
+            urlInput: document.getElementById('url-input'),
+            homeSearch: document.getElementById('home-search'),
+            homeSearchBtn: document.getElementById('home-search-btn'),
+            loader: document.getElementById('loader'),
+            errorContainer: document.getElementById('error-message'),
+            errorText: document.getElementById('error-text'),
+            iframe: document.getElementById('browser-view'),
+            welcome: document.getElementById('welcome-message'),
+            securityLabel: document.getElementById('security-label'),
+            statusText: document.getElementById('status-text'),
+            backBtn: document.getElementById('back-btn'),
+            forwardBtn: document.getElementById('forward-btn'),
+            refreshBtn: document.getElementById('refresh-btn'),
+            homeBtn: document.getElementById('home-btn')
+        };
+
+        const normalizeInput = (value) => {
+            let url = value.trim();
+
+            if (!url) {
+                return '';
+            }
 
             if (!url.startsWith('http://') && !url.startsWith('https://')) {
                 if (url.includes('.') && !url.includes(' ')) {
@@ -105,54 +170,138 @@
                     url = 'https://www.google.com/search?q=' + encodeURIComponent(url);
                 }
             }
-            urlInput.value = url;
 
-            // Reset UI states
-            errorMsgContainer.classList.add('hidden');
-            iframe.classList.add('hidden');
-            welcomeMsg.classList.add('hidden');
+            return url;
+        };
 
-            // Show loader
-            loader.classList.remove('hidden');
+        const updateNavigation = () => {
+            elements.backBtn.disabled = browserState.historyIndex <= 0;
+            elements.forwardBtn.disabled = browserState.historyIndex >= browserState.history.length - 1;
+        };
+
+        const setStatus = (status, security) => {
+            elements.statusText.textContent = status;
+            elements.securityLabel.textContent = security;
+        };
+
+        const showHome = () => {
+            elements.loader.classList.add('hidden');
+            elements.errorContainer.classList.add('hidden');
+            elements.iframe.classList.add('hidden');
+            elements.welcome.classList.remove('hidden');
+            elements.urlInput.value = '';
+            browserState.currentUrl = '';
+            setStatus('Home', 'Ready');
+            updateNavigation();
+        };
+
+        const showError = (message) => {
+            elements.loader.classList.add('hidden');
+            elements.iframe.classList.add('hidden');
+            elements.errorText.textContent = message;
+            elements.errorContainer.classList.remove('hidden');
+            setStatus('Issue detected', 'Warning');
+        };
+
+        const renderContent = (content) => {
+            const iframeDoc = elements.iframe.contentWindow.document;
+            iframeDoc.open();
+            iframeDoc.write(content);
+            iframeDoc.close();
+            elements.loader.classList.add('hidden');
+            elements.errorContainer.classList.add('hidden');
+            elements.iframe.classList.remove('hidden');
+            setStatus('Live page', 'Secure');
+        };
+
+        const navigateTo = async (value, options = {}) => {
+            const normalizedUrl = normalizeInput(value);
+
+            if (!normalizedUrl) {
+                showHome();
+                return;
+            }
+
+            elements.urlInput.value = normalizedUrl;
+            elements.welcome.classList.add('hidden');
+            elements.errorContainer.classList.add('hidden');
+            elements.iframe.classList.add('hidden');
+            elements.loader.classList.remove('hidden');
+            setStatus('Loading', 'Checking');
 
             try {
                 const response = await fetch('/fetch-url', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ url: url })
+                    body: JSON.stringify({ url: normalizedUrl })
                 });
 
                 const data = await response.json();
-                loader.classList.add('hidden');
 
-                if (response.ok) {
-                    const iframeDoc = iframe.contentWindow.document;
-                    iframeDoc.open();
-                    iframeDoc.write(data.content);
-                    iframeDoc.close();
-                    iframe.classList.remove('hidden');
-                } else {
-                    errorText.textContent = data.error || 'Oops! Unable to establish a connection.';
-                    errorMsgContainer.classList.remove('hidden');
+                if (!response.ok) {
+                    showError(data.error || 'Oops! Unable to establish a connection.');
+                    return;
                 }
+
+                if (!options.fromHistory) {
+                    browserState.history = browserState.history.slice(0, browserState.historyIndex + 1);
+                    browserState.history.push(normalizedUrl);
+                    browserState.historyIndex = browserState.history.length - 1;
+                }
+
+                browserState.currentUrl = normalizedUrl;
+                renderContent(data.content);
+                updateNavigation();
             } catch (error) {
-                loader.classList.add('hidden');
-                errorText.textContent = 'Server connection failed. Ensure Express is running.';
-                errorMsgContainer.classList.remove('hidden');
+                showError('Server connection failed. Start the app server and open this site from http://127.0.0.1:3000 instead of opening index.html directly.');
             }
         };
 
-        document.getElementById('search-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            handleSearch(document.getElementById('url-input').value);
+        elements.form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            navigateTo(elements.urlInput.value);
         });
 
-        document.getElementById('home-search').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                handleSearch(e.target.value);
+        elements.homeSearch.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                navigateTo(elements.homeSearch.value);
             }
         });
+
+        elements.homeSearchBtn.addEventListener('click', () => {
+            navigateTo(elements.homeSearch.value);
+        });
+
+        document.querySelectorAll('.quick-card').forEach((card) => {
+            card.addEventListener('click', () => {
+                navigateTo(card.dataset.url);
+            });
+        });
+
+        elements.backBtn.addEventListener('click', () => {
+            if (browserState.historyIndex > 0) {
+                browserState.historyIndex -= 1;
+                navigateTo(browserState.history[browserState.historyIndex], { fromHistory: true });
+            }
+        });
+
+        elements.forwardBtn.addEventListener('click', () => {
+            if (browserState.historyIndex < browserState.history.length - 1) {
+                browserState.historyIndex += 1;
+                navigateTo(browserState.history[browserState.historyIndex], { fromHistory: true });
+            }
+        });
+
+        elements.refreshBtn.addEventListener('click', () => {
+            if (browserState.currentUrl) {
+                navigateTo(browserState.currentUrl, { fromHistory: true });
+            }
+        });
+
+        elements.homeBtn.addEventListener('click', showHome);
+
+        updateNavigation();
     </script>
 </body>
-
 </html>

@@ -4,9 +4,19 @@ const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const publicDir = path.join(__dirname, 'public');
+const indexFile = path.join(publicDir, 'index.html');
 
-app.use(express.static('public'));
+app.use(express.static(publicDir));
 app.use(express.json());
+
+app.get('/health', (_req, res) => {
+    res.json({ ok: true });
+});
+
+app.get('/', (_req, res) => {
+    res.sendFile(indexFile);
+});
 
 app.post('/fetch-url', async (req, res) => {
     let { url } = req.body;
@@ -48,6 +58,6 @@ app.post('/fetch-url', async (req, res) => {
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+app.listen(PORT, '127.0.0.1', () => {
+    console.log(`Server is running on http://127.0.0.1:${PORT}`);
 });

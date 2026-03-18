@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Browser</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="browser-container">
+        <header class="browser-header">
+            <div class="window-controls">
+                <div class="control close"></div>
+                <div class="control minimize"></div>
+                <div class="control maximize"></div>
+            </div>
+            <div class="nav-buttons">
+                <button class="nav-btn" title="Back" type="button"><i class="fas fa-arrow-left"></i></button>
+                <button class="nav-btn" title="Forward" type="button"><i class="fas fa-arrow-right"></i></button>
+                <button class="nav-btn" title="Refresh" type="button"
+                    onclick="const iframe = document.getElementById('browser-view'); if(iframe.src && !iframe.classList.contains('hidden')) iframe.src = iframe.src;"><i
+                        class="fas fa-rotate-right"></i></button>
+                <button class="nav-btn" title="Home" type="button"
+                    onclick="document.getElementById('welcome-message').classList.remove('hidden'); document.getElementById('browser-view').classList.add('hidden'); document.getElementById('url-input').value = '';"><i
+                        class="fas fa-home"></i></button>
+            </div>
+            <form id="search-form" class="address-bar-container">
+                <div class="security-badge">
+                    <i class="fas fa-lock lock-icon"></i>
+                </div>
+                <input type="text" id="url-input" placeholder="Search or enter web address" required autocomplete="off">
+            </form>
+            <div class="menu-icon">
+                <div class="profile-pic"><i class="fas fa-user"></i></div>
+                <i class="fas fa-ellipsis-v"></i>
+            </div>
+        </header>
+
+        <div class="content-area">
+            <div id="loader" class="loader hidden">
+                <div class="spinner"></div>
+                <p>Connecting...</p>
+            </div>
+            <div id="error-message" class="error-message hidden">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span id="error-text">Failed to load content.</span>
+            </div>
+            <div id="welcome-message" class="welcome-message">
+                <div class="logo">
+                    <div class="logo-icon"><i class="fas fa-globe-americas"></i></div>
+                    <h1>Web Browser</h1>
+                </div>
+
+                <div class="search-box-large">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="home-search" placeholder="Search the web">
+                </div>
+
+                <div class="shortcuts">
+                    <div class="shortcut"
+                        onclick="document.getElementById('url-input').value = 'https://google.com'; document.getElementById('search-form').dispatchEvent(new Event('submit'));">
+                        <div class="shortcut-icon"><i class="fab fa-google" style="color: #4285F4;"></i></div>
+                        <span>Google</span>
+                    </div>
+                    <div class="shortcut"
+                        onclick="document.getElementById('url-input').value = 'https://github.com'; document.getElementById('search-form').dispatchEvent(new Event('submit'));">
+                        <div class="shortcut-icon"><i class="fab fa-github" style="color: #333;"></i></div>
+                        <span>GitHub</span>
+                    </div>
+                    <div class="shortcut"
+                        onclick="document.getElementById('url-input').value = 'https://youtube.com'; document.getElementById('search-form').dispatchEvent(new Event('submit'));">
+                        <div class="shortcut-icon"><i class="fab fa-youtube" style="color: #FF0000;"></i></div>
+                        <span>YouTube</span>
+                    </div>
+                    <div class="shortcut">
+                        <div class="shortcut-icon add-new"><i class="fas fa-plus"></i></div>
+                        <span>Add shortcut</span>
+                    </div>
+                </div>
+            </div>
+            <iframe id="browser-view" sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+                class="hidden"></iframe>
+        </div>
+    </div>
+
+    <script>
+        const handleSearch = async (url) => {
+            const urlInput = document.getElementById('url-input');
+            const loader = document.getElementById('loader');
+            const errorMsgContainer = document.getElementById('error-message');
+            const errorText = document.getElementById('error-text');
+            const iframe = document.getElementById('browser-view');
+            const welcomeMsg = document.getElementById('welcome-message');
+
+            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                if (url.includes('.') && !url.includes(' ')) {
+                    url = 'https://' + url;
+                } else {
+                    url = 'https://www.google.com/search?q=' + encodeURIComponent(url);
+                }
+            }
+            urlInput.value = url;
+
+            // Reset UI states
+            errorMsgContainer.classList.add('hidden');
+            iframe.classList.add('hidden');
+            welcomeMsg.classList.add('hidden');
+
+            // Show loader
+            loader.classList.remove('hidden');
+
+            try {
+                const response = await fetch('/fetch-url', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: url })
+                });
+
+                const data = await response.json();
+                loader.classList.add('hidden');
+
+                if (response.ok) {
+                    const iframeDoc = iframe.contentWindow.document;
+                    iframeDoc.open();
+                    iframeDoc.write(data.content);
+                    iframeDoc.close();
+                    iframe.classList.remove('hidden');
+                } else {
+                    errorText.textContent = data.error || 'Oops! Unable to establish a connection.';
+                    errorMsgContainer.classList.remove('hidden');
+                }
+            } catch (error) {
+                loader.classList.add('hidden');
+                errorText.textContent = 'Server connection failed. Ensure Express is running.';
+                errorMsgContainer.classList.remove('hidden');
+            }
+        };
+
+        document.getElementById('search-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            handleSearch(document.getElementById('url-input').value);
+        });
+
+        document.getElementById('home-search').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                handleSearch(e.target.value);
+            }
+        });
+    </script>
+</body>
+
+</html>
